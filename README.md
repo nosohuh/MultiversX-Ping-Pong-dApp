@@ -20,6 +20,13 @@
 - yarn
 - multiversx-sc-meta
 
+  
+You will use `sc-meta` to:
+
+1. **Create a wallet** to handle your transactions.
+2. **Build and deploy a contract** to the blockchain.
+
+
 ## 📁 Project Structure
 ![folder-structure-44588320bbf503cc91a989bb9cea0ccf](https://github.com/user-attachments/assets/3c10d4ff-0eb8-424c-8f2b-39c15d62a9a7)
 
@@ -37,8 +44,36 @@ sc-meta wallet new --format pem --outfile ./wallet/wallet-owner.pem
 2. Build & Deploy Smart Contract    
 
 ```bash
+git clone https://github.com/multiversx/mx-ping-pong-sc contract
 cd contract/ping-pong
 sc-meta all build
+```
+## Deploy the Smart Contract
+
+Next, let's deploy the smart contract to the blockchain.
+
+Ensure that the `wallet-owner.pem` file is placed in the `wallet/` folder and that the smart contract has been built.
+
+Before deploying, you will need to modify the wallet from which transactions are made. By default, transactions are made from a test wallet. To use the wallet you created earlier, follow the steps below:
+
+1. Navigate to the following directory: `/ping-pong/contract/ping-pong/interactor/src`.
+
+2. In the `interact.rs` file located at `/ping-pong/contract/ping-pong/interactor/src`, modify the `alice_wallet_address` variable in the `new` function as follows:
+
+   - **Before:**
+
+     ```rust
+     let alice_wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+     ```
+
+   - **After:**
+
+     ```rust
+     let alice_wallet_address = interactor
+         .register_wallet(Wallet::from_pem_file("/ping-pong/wallet/wallet-owner.pem").unwrap())
+         .await;
+     ```
+```rust
 cargo run deploy --ping-amount 1000000000000000000 --duration-in-seconds 180
 
 deploy::output:
@@ -49,7 +84,7 @@ sender's recalled nonce: 12422
 sc deploy tx hash: b6ca6c8e6ac54ed168bcd6929e762610e2360674f562115107cf3702b8a22467
 deploy address: erd1qqqqqqqqqqqqqpgqymj43x6anzr38jfz7kw3td2ew33v9jtrd8sse5zzk6
 new address: erd1qqqqqqqqqqqqqpgqymj43x6anzr38jfz7kw3td2ew33v9jtrd8sse5zzk6
-```
+ ```
 **!!!!If it doesn't work, ensure the path to the "wallet-owner.pem" file in the `alice_wallet_address` variable in the `interact.rs` file is correct!!**
 
 
